@@ -1,10 +1,129 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-TW">
 <head>
-</html>  
-<body>    
-<h1>微積分好好玩</h1>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>將 YouTube 影片嵌入網頁範本</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800 min-h-screen flex flex-col justify-between">
+
+    <header class="bg-white shadow-sm border-b border-slate-200">
+        <div class="max-w-5xl mx-auto px-4 py-6 text-center">
+            <h1 class="text-3xl font-bold text-slate-900 tracking-tight">YouTube 影片嵌入網頁範本</h1>
+            <p class="mt-2 text-slate-600">輕鬆將你的 YouTube 影片展示在個人或企業網頁上</p>
+        </div>
+    </header>
+
+    <main class="max-w-4xl mx-auto px-4 py-10 flex-grow w-full">
+        
+        <!-- Video Card Container -->
+        <div class="bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden mb-8 transition-all hover:shadow-2xl">
+            <!-- Responsive 16:9 Video Aspect Ratio Wrapper -->
+            <div class="relative w-full aspect-video bg-slate-900">
+                <!-- 請將下面 src 裡的 "dQw4w9WgXcQ" 替換成您自己的 YouTube 影片 ID -->
+                <iframe 
+                    id="youtube-player"
+                    class="absolute top-0 left-0 w-full h-full border-0"
+                    src="https://www.youtube.com/embed/dQw4w9WgXcQ?si=exampleId" 
+                    title="YouTube video player" 
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+                    referrerpolicy="strict-origin-when-cross-origin" 
+                    allowfullscreen>
+                </iframe>
+            </div>
+
+            <!-- Video Info & Instructions -->
+            <div class="p-6 md:p-8">
+                <h2 id="video-title" class="text-2xl font-bold text-slate-800 mb-2">如何更換您自己的影片？</h2>
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    觀看下方教學或直接修改程式碼中的影片 ID。YouTube 影片網址如 <code class="bg-slate-100 text-rose-600 px-2 py-1 rounded text-sm font-mono">https://www.youtube.com/watch?v=<span class="font-bold underline">dQw4w9WgXcQ</span></code>，其中的字串就是影片 ID。
+                </p>
+
+                <!-- Interactive ID Changer Tool -->
+                <div class="bg-slate-50 p-4 rounded-xl border border-slate-200">
+                    <label for="video-url-input" class="block text-sm font-semibold text-slate-700 mb-2">快速測試：輸入您的 YouTube 網址或影片 ID</label>
+                    <div class="flex flex-col sm:flex-row gap-3">
+                        <input 
+                            type="text" 
+                            id="video-url-input" 
+                            placeholder="例如: https://www.youtube.com/watch?v=YOUR_ID 或直接輸入 ID" 
+                            class="flex-grow px-4 py-2.5 rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-rose-500 focus:border-transparent text-sm"
+                        >
+                        <button 
+                            onclick="updateVideo()" 
+                            class="bg-rose-600 hover:bg-rose-700 text-white font-medium px-6 py-2.5 rounded-lg transition-colors text-sm shadow-md hover:shadow-lg cursor-pointer">
+                            更新預覽
+                        </button>
+                    </div>
+                    <p id="error-message" class="text-rose-500 text-xs mt-2 hidden">無法解析影片 ID，請檢查格式是否正確。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Instructions Card -->
+        <section class="bg-white rounded-xl shadow-md p-6 md:p-8 border border-slate-100">
+            <h3 class="text-xl font-bold text-slate-800 mb-4 flex items-center gap-2">
+                <svg class="w-6 h-6 text-rose-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                程式碼整合說明
+            </h3>
+            <ol class="list-decimal list-inside space-y-3 text-slate-600 text-sm md:text-base leading-relaxed">
+                <li>將上方的完整程式碼複製並儲存為 <code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-sm">index.html</code>。</li>
+                <li>找到標籤 <code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-sm">&lt;iframe&gt;</code> 中的 <code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-sm">src="..."</code>。</li>
+                <li>將網址中的 <code class="bg-slate-100 text-rose-600 px-1.5 py-0.5 rounded font-mono text-sm">dQw4w9WgXcQ</code> 改為您自己的 YouTube 影片 ID 即可。</li>
+                <li>使用 <code class="bg-slate-100 text-slate-800 px-1.5 py-0.5 rounded font-mono text-sm">aspect-video</code> 與 Tailwind 響應式類別，讓影片在手機與電腦上都能完美自動縮放尺寸。</li>
+            </ol>
+        </section>
+
+    </main>
+
+    <footer class="bg-white border-t border-slate-200 py-6 text-center text-slate-500 text-sm">
+        <p>© 2026 YouTube 影片網頁嵌入範本. All rights reserved.</p>
+    </footer>
+
+    <script>
+        // Extract YouTube Video ID from various URL formats or raw ID input
+        function extractVideoId(input) {
+            input = input.trim();
+            if (!input) return null;
+
+            // If it's already a clean ID (typically 11 characters alphanumeric/hyphen/underscore)
+            if (/^[a-zA-Z0-9_-]{11}$/.test(input)) {
+                return input;
+            }
+
+            // Regex patterns for YouTube URLs
+            const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+            const match = input.match(regExp);
+
+            return (match && match[2].length === 11) ? match[2] : null;
+        }
+
+        // Update the iframe source dynamically
+        function updateVideo() {
+            const inputVal = document.getElementById('video-url-input').value;
+            const iframe = document.getElementById('youtube-player');
+            const errorMsg = document.getElementById('error-message');
+
+            const videoId = extractVideoId(inputVal);
+
+            if (videoId) {
+                iframe.src = `https://www.youtube.com/embed/${videoId}`;
+                errorMsg.classList.add('hidden');
+                document.getElementById('video-url-input').value = '';
+            } else {
+                errorMsg.classList.remove('hidden');
+            }
+        }
+    </script>
 </body>
-</html>    
+</html>
 
 

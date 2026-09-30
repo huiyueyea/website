@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<meta name="description" content="Introduction to NTTU">
+<meta name="keywords" content="TFR, TNO, hoi4, mod, KX, PB">
+<meta name="author" content="huiyueyea">
+<meta name="viewport" content="width=device-width">
+<head>
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        html, body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .fullscreen-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            z-index: -1;
+        }
+    </style>
+</head>
+
+<head>
+    <style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #000;
+  color: #fff;
+}
+
+.top-right-title {
+  position: fixed;
+  top: 30px;
+  right: 40px;
+  z-index: 20;
+  color: #fff;
+  font-size: 28px;
+}
+.bg-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 1;
+}
+.bg-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 1s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.bg-image.active {
+  opacity: 1;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: linear-gradient(to right, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.2) 100%);
+  z-index: 2;
+}
+
+.dial-container {
+  position: fixed;
+  left: -200px; 
+  top: 50%;
+  transform: translateY(-50%);
+  width: 400px;
+  height: 400px;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
+  z-index: 10;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dial-item {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 190px;
+  height: 56px;
+  margin-top: -28px;
+  margin-left: 30px; 
+  transform-origin: -30px 50%; 
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: all 0.3s ease;
+  user-select: none;
+}
+.dial-item:hover {
+  opacity: 0.8;
+}
+.dial-item.active {
+  opacity: 1;
+  font-weight: bold;
+}
+.dial-content {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+  transform-origin: center;
+  transition: transform 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #fff;
+  margin-right: 12px;
+  box-shadow: 0 0 10px rgba(255,255,255,0.5);
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+.dial-item.active .dot {
+  transform: scale(1.4);
+  background: #ff0055;
+  box-shadow: 0 0 15px #ff0055;
+}
+.dial-label {
+  font-size: 16px;
+  letter-spacing: 1px;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.5);
+}
+
+.controls {
+  position: fixed;
+  left: 30px;
+  bottom: 40px;
+  z-index: 20;
+  display: flex;
+  gap: 15px;
+}
+.btn {
+  background: rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  font-size: 14px;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+}
+.btn:hover {
+  background: rgba(255, 255, 255, 0.3);
+  transform: translateY(-2px);
+}
+.btn:active {
+  transform: translateY(0);
+}
+
+.content-box {
+  position: fixed;
+  right: 10%;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  max-width: 450px;
+  background: rgba(0, 0, 0, 0.4);
+  padding: 40px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+.content-title {
+  font-size: 36px;
+  margin-bottom: 15px;
+  color: #fff;
+}
+    .content-desc {
+      font-size: 16px;
+      line-height: 1.6;
+      color: #ddd;
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-container" id="bgContainer"></div>
+<div class="overlay"></div>
+<h2 class="top-right-title">鋼鐵雄心四模組介紹</h2>
+
+<div class="dial-container" id="dial"></div>
+
+<div class="content-box">
+  <h1 class="content-title" id="infoTitle">載入中...</h1>
+  <p class="content-desc" id="infoDesc">載入中...</p>
+</div>
+
+<div class="controls">
+  <button class="btn" onclick="navigate(-1)">▲ 上一個</button>
+  <button class="btn" onclick="navigate(1)">▼ 下一個</button>
+</div>
+<script>
+
+  const slidesData = [
+    {
+      title: "the new order",
+      desc: "《The New Order: Last Days of Europe》是《鋼鐵雄心 IV》的架空歷史模組。故事從軸心國贏得第二次世界大戰後展開，玩家將在分裂的世界中帶領不同國家，面對政局、經濟與外交上的難題。",
+      img: "https://images.steamusercontent.com/ugc/2107179998418005760/86A93E22CAB0CF923721A09758BB534FEBB55631/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false"
+    },
+    {
+      title: "the fire rising",
+          desc: "《The Fire Rising》設定在2020。年，全球經濟崩潰與政治動盪引發了新一輪的世界衝突。玩家將面對資源短缺、國際緊張局勢與內部叛亂，努力在這個危機四伏的世界中生存並重建秩序。",
+      img: "https://static.wikitide.net/thefireriseswikiwiki/4/4b/Super_european_war.png"
+    },
+    {
+      title: "KaiserreduX",
+          desc: "《KaiserreduX》是《鋼鐵雄心 IV》的架空歷史模組，設定在第一次世界大戰後的德意志帝國。玩家將面對戰後的政治動盪、經濟困境與國際壓力，努力重建德國的榮耀。",
+      img: "https://images.steamusercontent.com/ugc/40076055405966975/8716D20481B97775C23538D54B5A733905A369F5/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
+    },
+    {
+      title: " red flood",
+          desc: "《Pax Britannica》是《鋼鐵雄心 IV》的架空歷史模組，設定在19世紀末至20世紀初的英國帝國時期。玩家將扮演英國或其他大國，面對殖民地管理、外交策略與軍事擴張的挑戰。",
+      img: "https://i.redd.it/j7qcaefu1skb1.png"
+    }
+
+  ];
+let currentIndex = 0;
+const total = slidesData.length;
+const angleStep = 360 / total; 
+const bgContainer = document.getElementById('bgContainer');
+const dial = document.getElementById('dial');
+const infoTitle = document.getElementById('infoTitle');
+const infoDesc = document.getElementById('infoDesc');
+
+function init() {
+  slidesData.forEach((data, index) => {
+
+    const img = document.createElement('img');
+    img.src = data.img;
+    img.alt = data.title;
+    img.classList.add('bg-image');
+    if (index === 0) img.classList.add('active');
+    bgContainer.appendChild(img);
+
+const item = document.createElement('div');
+item.classList.add('dial-item');
+if (index === 0) item.classList.add('active');
+
+const itemAngle = index * angleStep;
+item.style.transform = `rotate(${itemAngle}deg)`;
+item.innerHTML = `
+  <div class="dial-content">
+    <div class="dot"></div>
+    <span class="dial-label">${data.title}</span>
+  </div>
+`;
+
+item.addEventListener('click', () => {
+  goToSlide(index);
+});
+  dial.appendChild(item);
+});
+  updateUI();
+}
+
+function goToSlide(index) {
+  if (currentIndex === index) return;
+  currentIndex = index;
+  updateUI();
+}
+
+function navigate(direction) {
+  currentIndex = (currentIndex + direction + total) % total;
+  updateUI();
+}
+
+function updateUI() {
+
+  const images = bgContainer.querySelectorAll('.bg-image');
+  images.forEach((img, index) => {
+    if (index === currentIndex) {
+      img.classList.add('active');
+    } else {
+      img.classList.remove('active');
+    }
+  });
+
+const currentAngle = -currentIndex * angleStep;
+dial.style.transform = `translateY(-50%) rotate(${currentAngle}deg)`;
+
+const items = dial.querySelectorAll('.dial-item');
+items.forEach((item, index) => {
+  const content = item.querySelector('.dial-content');
+  const contentAngle = -(index - currentIndex) * angleStep;
+  content.style.transform = `rotate(${contentAngle}deg)`;
+
+  if (index === currentIndex) {
+    item.classList.add('active');
+  } else {
+    item.classList.remove('active');
+  }
+});
+
+  updateContent();
+}
+
+function updateContent() {
+  infoTitle.innerText = slidesData[currentIndex].title;
+  infoDesc.innerText = slidesData[currentIndex].desc;
+}
+
+    init();
+  </script>
+
+
+
+</body>
+</html>
+
+
