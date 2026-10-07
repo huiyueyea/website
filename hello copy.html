@@ -242,30 +242,30 @@ background: rgba(0, 0, 0, 0.45);
 <div class="music-player" id="youtubePlayer"></div>
 <script>
 
-  // Enter a YouTube video ID for each slide; leave blank to disable music.
+  // Paste each slide's YouTube iframe src URL or video ID here; leave blank for no music.
   const slidesData = [
     {
       title: "The New Order",
       desc: "《The New Order: Last Days of Europe》是鋼鐵雄心4的二戰背景模組。故事從軸心國贏得第二次世界大戰後展開，德國成為歐陸霸主，英法兩國因為工團運動而成為紅色國家。",
-      musicVideoId: "WtEqgG2EdTs",
+      musicUrl: "",
       img: "https://images.steamusercontent.com/ugc/2107179998418005760/86A93E22CAB0CF923721A09758BB534FEBB55631/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false"
     },
     {
       title: "The Fire Rising",
           desc: "《The Fire Rising》是鋼鐵雄心4的現代背景模組，故事始於我們熟知的新冠病毒，壓垮美國的最後一根稻草是沙特阿拉伯內戰，因為油價飆升與經濟衰弱導致美國第二次內戰發生。",
-      musicVideoId: "",
+      musicUrl: "https://www.youtube.com/watch?v=Add3ts5Htjk",
       img: "https://static.wikitide.net/thefireriseswikiwiki/4/4b/Super_european_war.png"
     },
     {
       title: "KaiserreduX",
           desc: "《KaiserreduX》是鋼鐵雄心4的架空歷史模組，設定在第一次世界大戰後的德意志帝國。玩家將面對戰後的政治動盪、經濟困境與國際壓力，努力重建德國的榮耀。",
-      musicVideoId: "",
+      musicUrl: "",
       img: "https://images.steamusercontent.com/ugc/40076055405966975/8716D20481B97775C23538D54B5A733905A369F5/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
     },
     {
       title: " Red Flood",
           desc: "《Red Flood》是鋼鐵雄心4的二戰後背景模組，在這個模組所有歐洲國家成為大戰的受害者，破敗的戰後時代導致一堆匪夷所思的意識形態，不同地位職位的人物出現在歷史舞台，帶領人們在通往未來的道路上飛速狂奔。",
-      musicVideoId: "",
+      musicUrl: "",
       img: "https://i.redd.it/j7qcaefu1skb1.png"
     }
 
@@ -281,11 +281,23 @@ const infoDesc = document.getElementById('infoDesc');
   let musicPlayer;
   let musicReady = false;
   let musicPlaying = false;
+  let loadedMusicId = '';
+  let autoplayBlocked = false;
+
+  function getMusicVideoId(musicUrl) {
+    if (!musicUrl) return '';
+    try {
+      const url = new URL(musicUrl);
+      if (url.hostname === 'youtu.be') return url.pathname.slice(1);
+      return url.searchParams.get('v') || url.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] || '';
+    } catch {
+      return musicUrl.trim();
+    }
+  }
 
   function onYouTubeIframeAPIReady() {
     musicPlayer = new YT.Player('youtubePlayer', {
-      videoId: slidesData[currentIndex].musicVideoId || undefined,
-      playerVars: { playsinline: 1 },
+      playerVars: { autoplay: 1, playsinline: 1 },
       events: {
         onReady: () => {
           musicReady = true;
@@ -293,29 +305,47 @@ const infoDesc = document.getElementById('infoDesc');
         },
         onStateChange: (event) => {
           musicPlaying = event.data === YT.PlayerState.PLAYING;
-          if (slidesData[currentIndex].musicVideoId) {
-            musicButton.innerText = musicPlaying ? '停止背景音樂' : '播放背景音樂';
+          if (getMusicVideoId(slidesData[currentIndex].musicUrl)) {
+            if (musicPlaying) {
+              autoplayBlocked = false;
+              musicButton.innerText = '停止背景音樂';
+            } else if (!autoplayBlocked) {
+              musicButton.innerText = '播放背景音樂';
+            }
           }
           musicButton.setAttribute('aria-pressed', String(musicPlaying));
+        },
+        onAutoplayBlocked: () => {
+          autoplayBlocked = true;
+          musicButton.innerText = '點擊啟用音樂';
         }
       }
     });
   }
 
   function setMusicForSlide() {
-    const videoId = slidesData[currentIndex].musicVideoId;
+    const videoId = getMusicVideoId(slidesData[currentIndex].musicUrl);
     musicPlaying = false;
     musicButton.disabled = !videoId;
     musicButton.innerText = videoId ? '播放背景音樂' : '此頁尚未設定音樂';
     musicButton.setAttribute('aria-pressed', 'false');
 
     if (!musicReady) return;
-    musicPlayer.pauseVideo();
-    if (videoId) musicPlayer.cueVideoById(videoId);
+    if (!videoId) {
+      musicPlayer.pauseVideo();
+      loadedMusicId = '';
+      autoplayBlocked = false;
+      return;
+    }
+    if (videoId !== loadedMusicId) {
+      loadedMusicId = videoId;
+      autoplayBlocked = false;
+      musicPlayer.loadVideoById(videoId);
+    }
   }
 
   function toggleMusic() {
-    if (!musicReady || !slidesData[currentIndex].musicVideoId) return;
+    if (!musicReady || !getMusicVideoId(slidesData[currentIndex].musicUrl)) return;
     if (musicPlaying) {
       musicPlayer.pauseVideo();
     } else {
