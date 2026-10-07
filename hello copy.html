@@ -161,16 +161,6 @@ background: rgba(0, 0, 0, 0.45);
   display: flex;
   gap: 15px;
 }
-.music-player {
-  position: fixed;
-  left: -220px;
-  bottom: -220px;
-  width: 200px;
-  height: 200px;
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-}
 .btn {
   background: rgba(255, 255, 255, 0.15);
   border: 1px solid rgba(255, 255, 255, 0.3);
@@ -233,33 +223,33 @@ background: rgba(0, 0, 0, 0.45);
   <button class="btn" onclick="navigate(-1)">▲ 上一個</button>
   <button class="btn" onclick="navigate(1)">▼ 下一個</button>
 </div>
-<div class="music-player" id="youtubePlayer"></div>
+<audio id="backgroundAudio" loop preload="auto"></audio>
 <script>
 
-  // Paste each slide's YouTube iframe src URL or video ID here; leave blank for no music.
+  // Enter a local music path for each slide, such as "music/song.mp3".
   const slidesData = [
     {
       title: "The New Order",
       desc: "《The New Order: Last Days of Europe》是鋼鐵雄心4的二戰背景模組。故事從軸心國贏得第二次世界大戰後展開，德國成為歐陸霸主，英法兩國因為工團運動而成為紅色國家。",
-      musicUrl: "",
+      musicPath: "",
       img: "https://images.steamusercontent.com/ugc/2107179998418005760/86A93E22CAB0CF923721A09758BB534FEBB55631/?imw=5000&imh=5000&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=false"
     },
     {
       title: "The Fire Rising",
           desc: "《The Fire Rising》是鋼鐵雄心4的現代背景模組，故事始於我們熟知的新冠病毒，壓垮美國的最後一根稻草是沙特阿拉伯內戰，因為油價飆升與經濟衰弱導致美國第二次內戰發生。",
-      musicUrl: "https://youtu.be/Add3ts5Htjk?si=FtPwhuI_V5iO7iU3",
+      musicPath: "",
       img: "https://static.wikitide.net/thefireriseswikiwiki/thumb/b/b5/Super_USA_civil_war.png/500px-Super_USA_civil_war.png"
     },
     {
       title: "KaiserreduX",
           desc: "《KaiserreduX》是鋼鐵雄心4的架空歷史模組，設定在第一次世界大戰後的德意志帝國。玩家將面對戰後的政治動盪、經濟困境與國際壓力，努力重建德國的榮耀。",
-      musicUrl: "",
+      musicPath: "",
       img: "https://images.steamusercontent.com/ugc/40076055405966975/8716D20481B97775C23538D54B5A733905A369F5/?imw=637&imh=358&ima=fit&impolicy=Letterbox&imcolor=%23000000&letterbox=true"
     },
     {
       title: " Red Flood",
           desc: "《Red Flood》是鋼鐵雄心4的二戰後背景模組，在這個模組所有歐洲國家成為大戰的受害者，破敗的戰後時代導致一堆匪夷所思的意識形態，不同地位職位的人物出現在歷史舞台，帶領人們在通往未來的道路上飛速狂奔。",
-      musicUrl: "",
+      musicPath: "",
       img: "https://i.redd.it/j7qcaefu1skb1.png"
     }
 
@@ -271,50 +261,34 @@ const bgContainer = document.getElementById('bgContainer');
 const dial = document.getElementById('dial');
 const infoTitle = document.getElementById('infoTitle');
 const infoDesc = document.getElementById('infoDesc');
-  let musicPlayer;
-  let musicReady = false;
-  let loadedMusicId = '';
-
-  function getMusicVideoId(musicUrl) {
-    if (!musicUrl) return '';
-    try {
-      const url = new URL(musicUrl);
-      if (url.hostname === 'youtu.be') return url.pathname.slice(1);
-      return url.searchParams.get('v') || url.pathname.match(/\/(?:embed|shorts|live)\/([^/?]+)/)?.[1] || '';
-    } catch {
-      return musicUrl.trim();
-    }
-  }
-
-  function onYouTubeIframeAPIReady() {
-    musicPlayer = new YT.Player('youtubePlayer', {
-      playerVars: { autoplay: 1, playsinline: 1 },
-      events: {
-        onReady: () => {
-          musicReady = true;
-          setMusicForSlide();
-        }
-      }
-    });
-  }
+  const backgroundAudio = document.getElementById('backgroundAudio');
+  let loadedMusicPath = '';
 
   function setMusicForSlide() {
-    const videoId = getMusicVideoId(slidesData[currentIndex].musicUrl);
-    if (!musicReady) return;
-    if (!videoId) {
-      musicPlayer.pauseVideo();
-      loadedMusicId = '';
+    const musicPath = slidesData[currentIndex].musicPath;
+    if (!musicPath) {
+      backgroundAudio.pause();
+      backgroundAudio.removeAttribute('src');
+      backgroundAudio.load();
+      loadedMusicPath = '';
       return;
     }
-    if (videoId !== loadedMusicId) {
-      loadedMusicId = videoId;
-      musicPlayer.loadVideoById(videoId);
+    if (musicPath !== loadedMusicPath) {
+      loadedMusicPath = musicPath;
+      backgroundAudio.src = musicPath;
+      backgroundAudio.load();
+      backgroundAudio.play().catch(() => {});
     }
   }
 
-  const youtubeApi = document.createElement('script');
-  youtubeApi.src = 'https://www.youtube.com/iframe_api';
-  document.head.appendChild(youtubeApi);
+  function resumeBackgroundMusic() {
+    if (backgroundAudio.src && backgroundAudio.paused) {
+      backgroundAudio.play().catch(() => {});
+    }
+  }
+
+  document.addEventListener('pointerdown', resumeBackgroundMusic);
+  document.addEventListener('keydown', resumeBackgroundMusic);
 
 function init() {
   slidesData.forEach((data, index) => {
