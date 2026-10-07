@@ -190,11 +190,6 @@ background: rgba(0, 0, 0, 0.45);
 .btn:active {
   transform: translateY(0);
 }
-.btn:disabled {
-  cursor: not-allowed;
-  opacity: 0.55;
-}
-
 .content-box {
   position: fixed;
   right: 10%;
@@ -237,7 +232,6 @@ background: rgba(0, 0, 0, 0.45);
 <div class="controls">
   <button class="btn" onclick="navigate(-1)">▲ 上一個</button>
   <button class="btn" onclick="navigate(1)">▼ 下一個</button>
-  <button class="btn" id="musicButton" onclick="toggleMusic()" aria-pressed="false" disabled>此頁尚未設定音樂</button>
 </div>
 <div class="music-player" id="youtubePlayer"></div>
 <script>
@@ -277,12 +271,9 @@ const bgContainer = document.getElementById('bgContainer');
 const dial = document.getElementById('dial');
 const infoTitle = document.getElementById('infoTitle');
 const infoDesc = document.getElementById('infoDesc');
-  const musicButton = document.getElementById('musicButton');
   let musicPlayer;
   let musicReady = false;
-  let musicPlaying = false;
   let loadedMusicId = '';
-  let autoplayBlocked = false;
 
   function getMusicVideoId(musicUrl) {
     if (!musicUrl) return '';
@@ -302,22 +293,6 @@ const infoDesc = document.getElementById('infoDesc');
         onReady: () => {
           musicReady = true;
           setMusicForSlide();
-        },
-        onStateChange: (event) => {
-          musicPlaying = event.data === YT.PlayerState.PLAYING;
-          if (getMusicVideoId(slidesData[currentIndex].musicUrl)) {
-            if (musicPlaying) {
-              autoplayBlocked = false;
-              musicButton.innerText = '停止背景音樂';
-            } else if (!autoplayBlocked) {
-              musicButton.innerText = '播放背景音樂';
-            }
-          }
-          musicButton.setAttribute('aria-pressed', String(musicPlaying));
-        },
-        onAutoplayBlocked: () => {
-          autoplayBlocked = true;
-          musicButton.innerText = '點擊啟用音樂';
         }
       }
     });
@@ -325,31 +300,15 @@ const infoDesc = document.getElementById('infoDesc');
 
   function setMusicForSlide() {
     const videoId = getMusicVideoId(slidesData[currentIndex].musicUrl);
-    musicPlaying = false;
-    musicButton.disabled = !videoId;
-    musicButton.innerText = videoId ? '播放背景音樂' : '此頁尚未設定音樂';
-    musicButton.setAttribute('aria-pressed', 'false');
-
     if (!musicReady) return;
     if (!videoId) {
       musicPlayer.pauseVideo();
       loadedMusicId = '';
-      autoplayBlocked = false;
       return;
     }
     if (videoId !== loadedMusicId) {
       loadedMusicId = videoId;
-      autoplayBlocked = false;
       musicPlayer.loadVideoById(videoId);
-    }
-  }
-
-  function toggleMusic() {
-    if (!musicReady || !getMusicVideoId(slidesData[currentIndex].musicUrl)) return;
-    if (musicPlaying) {
-      musicPlayer.pauseVideo();
-    } else {
-      musicPlayer.playVideo();
     }
   }
 
