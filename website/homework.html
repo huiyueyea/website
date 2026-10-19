@@ -232,24 +232,28 @@ background: rgba(0, 0, 0, 0.45);
       title: "The New Order",
       desc: "《The New Order: Last Days of Europe》是鋼鐵雄心4的二戰背景模組。故事從軸心國贏得第二次世界大戰後展開，德國成為歐陸霸主，英法兩國因為工團運動而成為紅色國家。",
       musicPath: "music/phoenix.ogg",
+      sound: 1.0,
       img: "Image/load_south_african_war_march.png"
     },
     {
       title: "The Fire Rising",
           desc: "《The Fire Rising》是鋼鐵雄心4的現代背景模組，故事始於我們熟知的新冠病毒，壓垮美國的最後一根稻草是沙特阿拉伯內戰，因為油價飆升與經濟衰弱導致美國第二次內戰發生。",
       musicPath: "music/When Johnny Comes Marching Home.mp3",
+      sound: 1.0,
       img: "https://static.wikitide.net/thefireriseswikiwiki/thumb/b/b5/Super_USA_civil_war.png/500px-Super_USA_civil_war.png"
     },
     {
       title: "KaiserreduX",
           desc: "《KaiserreduX》是鋼鐵雄心4的架空歷史模組，設定在第一次世界大戰後的同盟國戰勝的世界。玩家將面對戰後的政治動盪、經濟困境與國際壓力。",
       musicPath: "music/slav_battle.ogg",
+      sound: 1.0,
       img: "Image/load_45.png"
     },
     {
       title: " Red Flood",
           desc: "《Red Flood》是鋼鐵雄心4的一戰後背景模組，在這個模組中這場大戰沒有任何勝利者，破敗的戰後時代導致一堆匪夷所思的意識形態，不同地位職位的人物出現在歷史舞台，帶領人們在通往未來的道路上飛速狂奔。",
       musicPath: "music/Tchaikovsky_Marche_Slave_part_2.ogg",
+      sound: 1.0,
       img: "Image/load_yugo.png"
     },
 
@@ -257,6 +261,7 @@ background: rgba(0, 0, 0, 0.45);
       title: "TFR-OIOD",
           desc: "《TFR-OIOD》是鋼鐵雄心4的模組烈焰升騰中華民國子模組，在這個模組中一種前所未聞的病毒正悄然蔓延。 福爾摩沙，這座小島正於風雨中飄搖。 臺灣曾歷經不少風雨。 四百餘年春秋，從荷蘭人到鄭明; 從日本人的殖民到終迎光復，哪知不久后卻迎來流亡者的暴政。",
       musicPath: "music/Ambitionstothesky.ogg",
+      sound: 1.0,
       img: "Image/load_3.png"
     },
 
@@ -264,6 +269,7 @@ background: rgba(0, 0, 0, 0.45);
       title: "Pax Britannica",
           desc: "《Pax Britannica》是鋼鐵雄心4中以英美分治失敗為背景的大型架空歷史模組。在這個模組的世界線中，美國起義被大英帝國徹底鎮壓，北美十三州重回王室懷抱，導致本該誕生的民主燈塔胎死腹中。",
       musicPath: "music/LePerv.ogg",
+      sound: 0.6,
       img: "Image/MAIN_MENU_4.png"
     }
 
@@ -279,7 +285,9 @@ const infoDesc = document.getElementById('infoDesc');
   let loadedMusicPath = '';
 
   function setMusicForSlide() {
-    const musicPath = slidesData[currentIndex].musicPath;
+    const slide = slidesData[currentIndex];
+    const musicPath = slide.musicPath;
+    backgroundAudio.volume = slide.sound ?? 1;
     if (!musicPath) {
       backgroundAudio.pause();
       backgroundAudio.removeAttribute('src');
@@ -389,5 +397,4 @@ function updateContent() {
 
 </body>
 </html>
-
 
